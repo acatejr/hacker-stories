@@ -74,10 +74,10 @@ const App = () => {
 
 const Search = ({search, onSearch}) => {
   return (
-    <div>
-      <label htmlFor='seach'>Search: </label>
+    <>
+      <label key='1' htmlFor='search'>Search: {''} </label>
       <input id='search' type='text' onChange={onSearch} value={search}/>
-    </div>
+    </>
   )
 }
 
