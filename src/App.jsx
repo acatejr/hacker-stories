@@ -38,35 +38,33 @@ const stories = [
 ]
 
 const App = () => {
+  const [searchTerm, setSearchTerm] = React.useState('')
 
   const handleSearch = (event) => {
-    console.log(event.target.value)
+    setSearchTerm(event.target.value)
   }
+
+  const searchedStores = stories.filter((story) => {
+    return story.title.toLowerCase().includes(searchTerm.toLocaleLowerCase())
+  })
 
   return (
     <div>
       <h1>My Hacker Stories</h1>
       <Search onSearch={handleSearch}/>
       <hr />
-      <List list={stories}/>
+      <List list={searchedStores}/>
     </div>
   )  
 }
 
 
 const Search = (props) => {
-  const [searchTerm, setSearchTerm] = React.useState('')
-
-  const handleChange = (event) => {
-    setSearchTerm(event.target.value)
-    props.onSearch(event)
-  }
 
   return (
     <div>
       <label htmlFor='seach'>Search: </label>
-      <input id='search' type='text' onChange={handleChange}/>
-      <p>Searching for <strong>{searchTerm}</strong></p>
+      <input id='search' type='text' onChange={props.onSearch}/>
     </div>
   )
 }
@@ -91,8 +89,8 @@ const Item = (props) => {
       <span>{props.item.author}</span>
       <span>{props.item.num_comments}</span>
       <span>{props.item.points}</span>
-
     </li>
   )
 }
+
 export default App
