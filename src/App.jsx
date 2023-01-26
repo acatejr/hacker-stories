@@ -51,7 +51,7 @@ const App = () => {
   return (
     <div>
       <h1>My Hacker Stories</h1>
-      <Search onSearch={handleSearch}/>
+      <Search onSearch={handleSearch} search={searchTerm}/>
       <hr />
       <List list={searchedStores}/>
     </div>
@@ -59,36 +59,35 @@ const App = () => {
 }
 
 
-const Search = (props) => {
-
+const Search = ({search, onSearch}) => {
   return (
     <div>
       <label htmlFor='seach'>Search: </label>
-      <input id='search' type='text' onChange={props.onSearch}/>
+      <input id='search' type='text' onChange={onSearch} value={search}/>
     </div>
   )
 }
 
-const List = (props) => {
+const List = ({list}) => {
 
   return (
     <ul>
-      {props.list.map((item) => (
+      {list.map((item) => (
         <Item key={item.objectID} item={item} />
       ))}
     </ul>
   )
 }
 
-const Item = (props) => {
+const Item = ({item}) => {
   return (
     <li>
       <span>
-        <a href={props.item.url}>{props.item.title}</a>
+        <a href={item.url}>{item.title}</a>
       </span>
-      <span>{props.item.author}</span>
-      <span>{props.item.num_comments}</span>
-      <span>{props.item.points}</span>
+      <span>{item.author}</span>
+      <span>{item.num_comments}</span>
+      <span>{item.points}</span>
     </li>
   )
 }
