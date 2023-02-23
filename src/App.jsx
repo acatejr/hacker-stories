@@ -1,6 +1,7 @@
 import * as React from 'react'
 import axios from 'axios'
 import styles from './App.module.css'
+import { ReactComponent as Check } from './check.svg'
 
 const welcome = {
   greeting: 'Hey',
@@ -257,6 +258,8 @@ const Item = ({item, onRemoveItem}) => {
       <span style={{width: '10%'}}>
         <button type="button" onClick={() => {onRemoveItem(item)}} className={`${styles.button} ${styles.buttonSmall}`}>
           Dismiss
+
+          <Check height="18px" width="18px"/>
         </button>
       </span>
     </li>
