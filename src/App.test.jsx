@@ -111,6 +111,11 @@ describe('SearchForm', () => {
         fireEvent.submit(screen.getByRole('button'))
         expect(searchFormProps.onSearchSubmit).toHaveBeenCalledTimes(1)
     })
+
+    it('renders snapshot', () => {
+        const { container } = render(<SearchForm {...searchFormProps} />)
+        expect(container.firstChild).toMatchSnapshot()
+    })
 })
 
 describe('App', () => {
@@ -196,6 +201,7 @@ describe('App', () => {
 
         render(<App />)
         await waitFor(async () => await reactPromise)
+        
         expect(screen.queryByDisplayValue('React')).toBeInTheDocument()
         expect(screen.queryByDisplayValue('JavaScript')).toBeNull()
         expect(screen.queryByText('Jordan Walke')).toBeInTheDocument()
@@ -203,6 +209,28 @@ describe('App', () => {
             screen.queryByText('Dan Abramov, Andrew Clark')
         ).toBeInTheDocument()
         expect(screen.queryByText('Brenden Eich')).toBeNull()
+
+        // User Interaction -> Search
+        fireEvent.change(screen.queryByDisplayValue('React'), {
+            target: {
+                value: 'JavaScript'
+            }
+        })
+
+        expect(screen.queryByDisplayValue('React')).toBeNull()
+        expect(
+            screen.queryByDisplayValue('JavaScript')
+        ).toBeInTheDocument()
+
+        fireEvent.submit(screen.queryByText('Submit'))
+        
+        // Second data fetching
+        await waitFor(async () => await javascriptPromise)
+        expect(screen.queryByText('Jordan Walke')).toBeInTheDocument()
+        expect(
+            screen.queryByText('Dan Abramov, Andrew Clark')
+        ).toBeInTheDocument()
+        expect(screen.queryByText('Brendon Eich')).toBeNull()
 
     })
 
