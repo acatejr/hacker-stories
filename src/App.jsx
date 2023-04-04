@@ -1,5 +1,6 @@
-import * as React from 'react';
-import axios from 'axios';
+import * as React from 'react'
+import axios from 'axios'
+import { sortBy } from 'lodash'
 import { SearchForm } from './SearchForm'
 import { List } from './List'
 
@@ -49,6 +50,14 @@ const useStorageState = (key, initialState) => {
 };
 
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
+
+const SORTS = {
+  NONE: (list) => list,
+  TITLE: (list) => sortBy(list, 'title'),
+  AUTHOR: (list) => sortBy(list, 'author'),
+  COMMENT: (list) => sortBy(list, 'num_comments').reverse(),
+  POINT: (list) => sortBy(list, 'points').reverse(),
+}
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useStorageState(
@@ -121,9 +130,9 @@ const App = () => {
         <List list={stories.data} onRemoveItem={handleRemoveStory} />
       )}
     </div>
-  );
-};
+  )
+}
 
-export default App;
-
-//export { storiesReducer, SearchForm, InputWithLabel, List, Item };
+export default App
+export {SORTS}
+// export { storiesReducer, SearchForm, InputWithLabel, List, Item };
