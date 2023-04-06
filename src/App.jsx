@@ -59,14 +59,37 @@ const SORTS = {
   POINT: (list) => sortBy(list, 'points').reverse(),
 }
 
+const extractSearchTerm = (url) => url.replace(API_ENDPOINT, '')
+// const getLastSearches = (urls) => urls.slice(-6).slice(0, -1).map(extractSearchTerm)
+const getLastSearches = (urls) => 
+  urls
+    .reduce((result, url, index) => {
+      const searchTerm = extractSearchTerm(url)
+
+      if (index === 0) {
+        return result.concat(searchTerm)
+      }
+
+      const previousSearchTerm = result[result.length - 1]
+
+      if (searchTerm === previousSearchTerm) {
+        return result
+      } else {
+        return result.concat(searchTerm)
+      }
+    }, [])
+    .slice(-6).slice(0, -1)
+
+const getUrl = (searchTerm) => `${API_ENDPOINT}${searchTerm}`
+
 const App = () => {
   const [searchTerm, setSearchTerm] = useStorageState(
     'search',
     'React'
   );
 
-  const [url, setUrl] = React.useState(
-    `${API_ENDPOINT}${searchTerm}`
+  const [urls, setUrls] = React.useState(
+    [getUrl(searchTerm)]
   );
 
   const [stories, dispatchStories] = React.useReducer(
@@ -74,11 +97,17 @@ const App = () => {
     { data: [], isLoading: false, isError: false }
   );
 
+  const handleSearch = (searchTerm) => {
+    const url = getUrl(searchTerm)
+    setUrls(urls.concat(url))
+  }
+
   const handleFetchStories = React.useCallback(async () => {
     dispatchStories({ type: 'STORIES_FETCH_INIT' });
 
     try {
-      const result = await axios.get(url);
+      const lastUrl = urls[urls.length - 1]
+      const result = await axios.get(lastUrl);
 
       dispatchStories({
         type: 'STORIES_FETCH_SUCCESS',
@@ -87,7 +116,7 @@ const App = () => {
     } catch {
       dispatchStories({ type: 'STORIES_FETCH_FAILURE' });
     }
-  }, [url]);
+  }, [urls]);
 
   React.useEffect(() => {
     handleFetchStories();
@@ -102,14 +131,19 @@ const App = () => {
 
   const handleSearchInput = (event) => {
     setSearchTerm(event.target.value);
-  };
+  }
 
   const handleSearchSubmit = (event) => {
-    setUrl(`${API_ENDPOINT}${searchTerm}`);
+    handleSearchTerm(searchTerm)
+    event.preventDefault()
+  }
 
-    event.preventDefault();
-  };
+  const lastSearches = getLastSearches(urls)
 
+  const handleLastSearch = (searchTerm) => {
+    handleSearchTerm(searchTerm)
+  }
+  
   return (
     <div>
       <h1>My Hacker Stories</h1>
@@ -120,6 +154,8 @@ const App = () => {
         onSearchSubmit={handleSearchSubmit}
       />
 
+      <LastSearches lastSearches={lastSearches} onLastSearch={handleLastSearch} />
+      
       <hr />
 
       {stories.isError && <p>Something went wrong ...</p>}
@@ -131,6 +167,16 @@ const App = () => {
       )}
     </div>
   )
+}
+
+const LastSearches = ({ lastSearches, onLastSearch }) => {
+  <>
+     {lastSearches.map((searchTerm, index) => (
+       <button key={searchTerm + index} type='button' onClick={() => onLastSearch(searchTerm)}>
+        {searchTerm}
+      </button>
+     ))}
+  </>
 }
 
 export default App
